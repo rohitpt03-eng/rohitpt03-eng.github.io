@@ -59,7 +59,7 @@ export const App: React.FC = () => {
               GitHub
             </a>
             <a
-              href="https://linkedin.com/"
+              href="https://www.linkedin.com/in/rohit-kumar-b229aa255"
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center justify-center rounded-full border-2 border-[#D7E2EA]/50 text-[#D7E2EA] font-medium uppercase tracking-widest px-8 py-3 sm:px-10 sm:py-3.5 text-xs sm:text-sm hover:border-white hover:bg-[#D7E2EA]/10 transition-all duration-200"
