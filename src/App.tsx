@@ -44,12 +44,18 @@ export const App: React.FC = () => {
           >
             Let&apos;s Build Something
           </h3>
-          <p className="text-sm sm:text-base text-[#D7E2EA]/70 max-w-lg mb-8 font-light leading-relaxed">
+          <p className="text-sm sm:text-base text-[#D7E2EA]/70 max-w-lg mb-4 font-light leading-relaxed">
             Interested in working together, exploring electronics, or discussing a web or programming project?
           </p>
+          <a
+            href="mailto:rohit.pt03@gmail.com"
+            className="text-base sm:text-lg text-[#BBCCD7] hover:text-white font-medium tracking-wide underline decoration-[#7621B0] decoration-2 underline-offset-4 mb-8 transition-colors"
+          >
+            rohit.pt03@gmail.com
+          </a>
 
           <div className="flex flex-wrap items-center justify-center gap-4 mb-12">
-            <ContactButton href="mailto:rohit@example.com" />
+            <ContactButton href="mailto:rohit.pt03@gmail.com" />
             <a
               href="https://github.com/rohitpt03-eng"
               target="_blank"
