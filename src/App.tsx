@@ -1,96 +1,180 @@
-import React from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
+import { DEFAULT_PORTFOLIO_CONFIG } from "./data/portfolioConfig";
+import { CONSTRUCTION_SCRIPT } from "./data/agents";
+import type { ConstructionStep, PortfolioConfig } from "./types/portfolio";
+import { CursorSpotlight } from "./components/common/CursorSpotlight";
+import { GhostAgentsOverlay } from "./components/agents/GhostAgentsOverlay";
+import { PortfolioEditorModal } from "./components/agents/PortfolioEditorModal";
 import { HeroSection } from "./components/sections/HeroSection";
 import { MarqueeSection } from "./components/sections/MarqueeSection";
 import { AboutSection } from "./components/sections/AboutSection";
-import { ServicesSection } from "./components/sections/ServicesSection";
+import { SkillsSection } from "./components/sections/SkillsSection";
 import { ProjectsSection } from "./components/sections/ProjectsSection";
-import { ContactButton } from "./components/common/ContactButton";
-import { FadeIn } from "./components/common/FadeIn";
+import { ExperienceSection } from "./components/sections/ExperienceSection";
+import { EducationSection } from "./components/sections/EducationSection";
+import { AchievementsSection } from "./components/sections/AchievementsSection";
+import { ContactSection } from "./components/sections/ContactSection";
+
+const STORAGE_KEY = "ghost_ai_rohit_portfolio_v2";
+
+function loadStoredConfig(): PortfolioConfig {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return DEFAULT_PORTFOLIO_CONFIG;
+    const parsed = JSON.parse(raw) as Partial<PortfolioConfig>;
+    return {
+      ...DEFAULT_PORTFOLIO_CONFIG,
+      ...parsed,
+      identity: {
+        ...DEFAULT_PORTFOLIO_CONFIG.identity,
+        ...(parsed.identity ?? {}),
+      },
+      about: {
+        ...DEFAULT_PORTFOLIO_CONFIG.about,
+        ...(parsed.about ?? {}),
+      },
+      contact: {
+        ...DEFAULT_PORTFOLIO_CONFIG.contact,
+        ...(parsed.contact ?? {}),
+      },
+      skills: parsed.skills ?? DEFAULT_PORTFOLIO_CONFIG.skills,
+      projects: parsed.projects ?? DEFAULT_PORTFOLIO_CONFIG.projects,
+      experience: parsed.experience ?? DEFAULT_PORTFOLIO_CONFIG.experience,
+      education: parsed.education ?? DEFAULT_PORTFOLIO_CONFIG.education,
+      achievements: parsed.achievements ?? DEFAULT_PORTFOLIO_CONFIG.achievements,
+    };
+  } catch {
+    return DEFAULT_PORTFOLIO_CONFIG;
+  }
+}
 
 export const App: React.FC = () => {
+  const [config, setConfig] = useState<PortfolioConfig>(loadStoredConfig);
+  const [currentStep, setCurrentStep] = useState<ConstructionStep>(0);
+  const [runKey, setRunKey] = useState<number>(1);
+  const [editorOpen, setEditorOpen] = useState<boolean>(false);
+
+  const timersRef = useRef<number[]>([]);
+
+  const clearScheduledTimers = useCallback(() => {
+    timersRef.current.forEach((id) => window.clearTimeout(id));
+    timersRef.current = [];
+  }, []);
+
+  // Run the 10-step live portfolio construction choreography
+  useEffect(() => {
+    clearScheduledTimers();
+    setCurrentStep(0);
+
+    let elapsed = 0;
+
+    CONSTRUCTION_SCRIPT.forEach((phase, index) => {
+      const enterTimeout = window.setTimeout(() => {
+        setCurrentStep(phase.step);
+      }, index === 0 ? 0 : elapsed);
+
+      timersRef.current.push(enterTimeout);
+      elapsed += phase.durationMs;
+    });
+
+    return clearScheduledTimers;
+  }, [runKey, clearScheduledTimers]);
+
+  const handleReplay = useCallback(() => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+    window.dispatchEvent(new CustomEvent("ghost-replay"));
+    setRunKey((prev) => prev + 1);
+  }, []);
+
+  const handleConfigChange = useCallback(
+    (next: PortfolioConfig, _changedSection: string) => {
+      setConfig(next);
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+      } catch {
+        // Ignore storage quota errors
+      }
+    },
+    []
+  );
+
+  const handleResetConfig = useCallback(() => {
+    setConfig(DEFAULT_PORTFOLIO_CONFIG);
+    try {
+      localStorage.removeItem(STORAGE_KEY);
+    } catch {
+      // Ignore storage removal errors
+    }
+  }, []);
+
   return (
-    <main
+    <div
       className="w-full min-h-screen bg-[#0C0C0C] font-kanit text-[#D7E2EA] relative"
       style={{ overflowX: "clip" }}
     >
-      {/* 1. Hero Section */}
-      <HeroSection />
+      {/* Subtle studio cursor ambient light */}
+      <CursorSpotlight />
 
-      {/* 2. Marquee Section */}
-      <MarqueeSection />
+      {/* 28 animated desktop / 14 mobile real OS pointers (auto-hide as sections finish) */}
+      <GhostAgentsOverlay
+        currentStep={currentStep}
+        visible={true}
+        runKey={runKey}
+      />
 
-      {/* 3. About Section */}
-      <AboutSection />
+      {/* Main Portfolio Modules matching original layout & theme */}
+      <main className="relative z-10">
+        <HeroSection
+          identity={config.identity}
+          currentStep={currentStep}
+          runKey={runKey}
+          onReplay={handleReplay}
+          onOpenEditor={() => setEditorOpen(true)}
+        />
 
-      {/* 4. Services Section */}
-      <ServicesSection />
+        <MarqueeSection currentStep={currentStep} />
 
-      {/* 5. Projects Section */}
-      <ProjectsSection />
+        <AboutSection about={config.about} currentStep={currentStep} />
 
-      {/* Footer / Contact Anchor */}
-      {/* Footer / Contact Anchor */}
-      <footer
-        id="contact"
-        className="w-full bg-[#0C0C0C] py-20 px-6 md:px-10 border-t border-[#D7E2EA]/10 relative z-20 flex flex-col items-center text-center"
-      >
-        <FadeIn delay={0} y={30} className="max-w-3xl flex flex-col items-center w-full">
-          <span className="text-xs uppercase tracking-widest text-[#D7E2EA]/60 mb-3">
-            Learn &bull; Build &bull; Improve &bull; Repeat
-          </span>
-          <h3
-            className="hero-heading font-black uppercase tracking-tight mb-4"
-            style={{ fontSize: "clamp(2.2rem, 6.5vw, 5rem)" }}
-          >
-            Let&apos;s Build Something
-          </h3>
-          <p className="text-sm sm:text-base text-[#D7E2EA]/70 max-w-lg mb-4 font-light leading-relaxed">
-            Interested in working together, exploring electronics, or discussing a web or programming project?
-          </p>
-          <a
-            href="mailto:rohit.pt03@gmail.com"
-            className="text-base sm:text-lg text-[#BBCCD7] hover:text-white font-medium tracking-wide underline decoration-[#7621B0] decoration-2 underline-offset-4 mb-8 transition-colors"
-          >
-            rohit.pt03@gmail.com
-          </a>
+        <SkillsSection skills={config.skills} currentStep={currentStep} />
 
-          <div className="flex flex-wrap items-center justify-center gap-4 mb-12">
-            <ContactButton href="mailto:rohit.pt03@gmail.com" />
-            <a
-              href="https://github.com/rohitpt03-eng"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center justify-center rounded-full border-2 border-[#D7E2EA]/50 text-[#D7E2EA] font-medium uppercase tracking-widest px-8 py-3 sm:px-10 sm:py-3.5 text-xs sm:text-sm hover:border-white hover:bg-[#D7E2EA]/10 transition-all duration-200"
-            >
-              GitHub
-            </a>
-            <a
-              href="https://www.linkedin.com/in/rohit-kumar-b229aa255"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center justify-center rounded-full border-2 border-[#D7E2EA]/50 text-[#D7E2EA] font-medium uppercase tracking-widest px-8 py-3 sm:px-10 sm:py-3.5 text-xs sm:text-sm hover:border-white hover:bg-[#D7E2EA]/10 transition-all duration-200"
-            >
-              LinkedIn
-            </a>
-          </div>
+        <ProjectsSection
+          projects={config.projects}
+          currentStep={currentStep}
+        />
 
-          <div className="pt-8 border-t border-[#D7E2EA]/10 w-full flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-[#D7E2EA]/50 uppercase tracking-wider">
-            <span>&copy; {new Date().getFullYear()} Rohit &mdash; B.Tech ECE | Programmer | Web Developer</span>
-            <div className="flex gap-6">
-              <a href="#about" className="hover:text-[#D7E2EA] transition-colors">
-                About
-              </a>
-              <a href="#services" className="hover:text-[#D7E2EA] transition-colors">
-                Skills
-              </a>
-              <a href="#projects" className="hover:text-[#D7E2EA] transition-colors">
-                Projects
-              </a>
-            </div>
-          </div>
-        </FadeIn>
-      </footer>
-    </main>
+        <ExperienceSection
+          experience={config.experience}
+          currentStep={currentStep}
+        />
+
+        <EducationSection
+          education={config.education}
+          currentStep={currentStep}
+        />
+
+        <AchievementsSection
+          achievements={config.achievements}
+          currentStep={currentStep}
+        />
+      </main>
+
+      <ContactSection
+        contact={config.contact}
+        name={config.identity.name}
+        motto={config.identity.motto}
+        currentStep={currentStep}
+      />
+
+      {/* Live Content Configuration Drawer */}
+      <PortfolioEditorModal
+        open={editorOpen}
+        config={config}
+        onClose={() => setEditorOpen(false)}
+        onChange={handleConfigChange}
+        onReset={handleResetConfig}
+      />
+    </div>
   );
 };
 

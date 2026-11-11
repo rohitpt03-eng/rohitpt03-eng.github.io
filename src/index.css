@@ -16,14 +16,48 @@ html, body, #root {
   min-height: 100vh;
 }
 
-/* Hero heading gradient text */
+/* Original Hero Chrome-Steel Gradient Text */
 .hero-heading {
   background: linear-gradient(180deg, #646973 0%, #BBCCD7 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
-/* Custom scrollbar */
+/* Dark Minimal HUD Surfaces matching original palette */
+.glass-panel {
+  background: rgba(14, 14, 18, 0.82);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(215, 226, 234, 0.14);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.6);
+}
+
+.glass-panel-glow {
+  background: rgba(15, 15, 20, 0.9);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border: 1px solid rgba(215, 226, 234, 0.2);
+  box-shadow:
+    0 14px 36px rgba(0, 0, 0, 0.72),
+    0 0 24px -10px rgba(118, 33, 176, 0.4);
+}
+
+/* Agent active wireframe build highlight */
+.agent-building-highlight {
+  box-shadow:
+    0 0 0 1px rgba(215, 226, 234, 0.55),
+    0 0 22px rgba(118, 33, 176, 0.35);
+}
+
+/* Subtle flash when a Ghost OS pointer clicks a real button or link */
+.agent-touch-active {
+  outline: 1.5px solid #BBCCD7 !important;
+  outline-offset: 2px;
+  box-shadow: 0 0 16px rgba(182, 0, 168, 0.4) !important;
+  transition: outline 0.15s ease, box-shadow 0.2s ease !important;
+}
+
+/* Original Custom Scrollbar */
 ::-webkit-scrollbar {
   width: 8px;
 }

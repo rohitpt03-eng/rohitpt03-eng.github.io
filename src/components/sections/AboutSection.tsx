@@ -1,19 +1,27 @@
 import React from "react";
 import { FadeIn } from "../common/FadeIn";
 import { ContactButton } from "../common/ContactButton";
+import { BuildBlock } from "../common/BuildBlock";
 import { AnimatedText } from "./AnimatedText";
+import type { ConstructionStep, PortfolioConfig } from "../../types/portfolio";
 
-export const AboutSection: React.FC = () => {
-  const aboutText =
-    "I am pursuing B.Tech in Electronics & Communication Engineering (ECE). I enjoy working with C and C++, building modern websites, and exploring electronics and embedded systems. My focus is on continuously improving my technical skills and turning ideas into practical projects. Let's build something incredible together!";
+interface AboutSectionProps {
+  about: PortfolioConfig["about"];
+  currentStep: ConstructionStep;
+}
+
+export const AboutSection: React.FC<AboutSectionProps> = ({
+  about,
+  currentStep,
+}) => {
+  const aboutText = about.paragraphs.join(" ");
 
   return (
     <section
       id="about"
       className="relative min-h-screen flex flex-col items-center justify-center px-5 sm:px-8 md:px-10 py-20 bg-[#0C0C0C] overflow-hidden select-none"
     >
-      {/* Decorative Corner 3D Elements */}
-      {/* Top-left: Moon icon */}
+      {/* Original Decorative Corner 3D Elements */}
       <div className="absolute top-[4%] left-[1%] sm:left-[2%] md:left-[4%] pointer-events-none z-10">
         <FadeIn delay={0.1} x={-80} y={0} duration={0.9}>
           <img
@@ -25,7 +33,6 @@ export const AboutSection: React.FC = () => {
         </FadeIn>
       </div>
 
-      {/* Bottom-left: 3D object */}
       <div className="absolute bottom-[8%] left-[3%] sm:left-[6%] md:left-[10%] pointer-events-none z-10">
         <FadeIn delay={0.25} x={-80} y={0} duration={0.9}>
           <img
@@ -37,7 +44,6 @@ export const AboutSection: React.FC = () => {
         </FadeIn>
       </div>
 
-      {/* Top-right: Lego icon */}
       <div className="absolute top-[4%] right-[1%] sm:right-[2%] md:right-[4%] pointer-events-none z-10">
         <FadeIn delay={0.15} x={80} y={0} duration={0.9}>
           <img
@@ -49,7 +55,6 @@ export const AboutSection: React.FC = () => {
         </FadeIn>
       </div>
 
-      {/* Bottom-right: 3D group */}
       <div className="absolute bottom-[8%] right-[3%] sm:right-[6%] md:right-[10%] pointer-events-none z-10">
         <FadeIn delay={0.3} x={80} y={0} duration={0.9}>
           <img
@@ -62,18 +67,21 @@ export const AboutSection: React.FC = () => {
       </div>
 
       {/* Main Content */}
-      <div className="relative z-20 flex flex-col items-center max-w-4xl mx-auto w-full">
-        {/* Heading */}
-        <FadeIn delay={0} y={40} className="w-full text-center">
+      <BuildBlock
+        currentStep={currentStep}
+        unlockStep={6}
+        targetId="about-card"
+        className="relative z-20 flex flex-col items-center max-w-4xl mx-auto w-full"
+      >
+        <div className="w-full text-center">
           <h2
             className="hero-heading font-black uppercase leading-none tracking-tight"
             style={{ fontSize: "clamp(3rem, 12vw, 160px)" }}
           >
-            About me
+            {about.title}
           </h2>
-        </FadeIn>
+        </div>
 
-        {/* Gap between heading and text: gap-10 sm:gap-14 md:gap-16 */}
         <div className="mt-10 sm:mt-14 md:mt-16 w-full flex justify-center px-4">
           <div className="max-w-[560px]">
             <AnimatedText
@@ -84,13 +92,10 @@ export const AboutSection: React.FC = () => {
           </div>
         </div>
 
-        {/* Gap between text block and button: gap-16 sm:gap-20 md:gap-24 */}
         <div className="mt-16 sm:mt-20 md:mt-24">
-          <FadeIn delay={0.2} y={20}>
-            <ContactButton />
-          </FadeIn>
+          <ContactButton href="#contact" />
         </div>
-      </div>
+      </BuildBlock>
     </section>
   );
 };

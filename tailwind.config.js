@@ -8,6 +8,7 @@ export default {
     extend: {
       fontFamily: {
         kanit: ['Kanit', 'sans-serif'],
+        mono: ['JetBrains Mono', 'monospace'],
       },
       colors: {
         dark: '#0C0C0C',
